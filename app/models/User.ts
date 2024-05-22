@@ -1,19 +1,21 @@
-//mongoos schema
 import mongoose from "mongoose";
+
 interface User {
-    _id: mongoose.Types.ObjectId;
-    username: string;
-    email: string;
-    password: string;
+  _id: mongoose.Types.ObjectId;
+  email: string;
+  password: string;
+  name: string;
 }
 
-const userSchema = new mongoose.Schema<User>({
-    username: { type: String, required: true },
+const userSchema = new mongoose.Schema<User>(
+  {
     email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
-    password: { type: String, required: true, minlength: 6 },
-}, {
-    timestamps: true
-});
+    password: { type: String, required: true, minlength: 3 },
+    name: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-//mongoos model (name, schema)
 export default mongoose.models.User || mongoose.model<User>("User", userSchema);

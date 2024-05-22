@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { login } from "../libs/auth";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../libs/authContext";  // تأكد من تعديل المسار بشكل صحيح
 
 const LoginForm: React.FC = () => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const router = useRouter();
+  const { login: authLogin } = useAuth();
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -11,22 +14,39 @@ const LoginForm: React.FC = () => {
       ...prevState,
       [id]: value,
     }));
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // handle login logic here
+
+    if (!formData.email || !formData.password) {
+      setError("Email and password fields cannot be empty.");
+      return;
+    }
+
     try {
-      const data = await login(formData.username, formData.password);
-      if(data.error) {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
         setError(data.error);
+        return;
       }
-      else {
-        console.log('login tamam', data);
-      }
+
+      const data = await response.json();
+      console.log("Login successful", data);
+      authLogin(data.token, data.user.name, data.user.id); // تمرير معرف المستخدم هنا
+
     } catch (error) {
       console.log(error);
-      setError('An unexpected error occurred. Please try again.');
+      setError("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -38,17 +58,17 @@ const LoginForm: React.FC = () => {
       <div className="mb-4">
         <label
           className="block text-gray-700 text-sm font-bold mb-2"
-          htmlFor="username"
+          htmlFor="email"
         >
-          Username
+          Email
         </label>
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="username"
+          id="email"
           type="text"
-          value={formData.username}
+          value={formData.email}
           onChange={handleChange}
-          placeholder="Username"
+          placeholder="Email Address"
         />
       </div>
       <div className="mb-6">
@@ -59,13 +79,16 @@ const LoginForm: React.FC = () => {
           Password
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="password"
           type="password"
           value={formData.password}
           onChange={handleChange}
           placeholder="******************"
         />
+        {error && !formData.password && (
+          <p className="text-red-500 text-xs italic">{error}</p>
+        )}
       </div>
       <div className="flex items-center justify-between">
         <button
@@ -75,6 +98,9 @@ const LoginForm: React.FC = () => {
           Sign In
         </button>
       </div>
+      {error && formData.email && formData.password && (
+        <p className="text-red-500 text-xs italic">{error}</p>
+      )}
     </form>
   );
 };
