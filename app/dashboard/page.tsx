@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../libs/authContext';
+import AddTransactionForm from '../components/dashboard/AddTransactionForm';
 
 const Dashboard: React.FC = () => {
   const router = useRouter();
@@ -28,6 +29,10 @@ const Dashboard: React.FC = () => {
       >
         Logout
       </button>
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">Add New Transaction</h2>
+        <AddTransactionForm />
+      </div>
     </div>
   );
 };
