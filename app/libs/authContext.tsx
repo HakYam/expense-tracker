@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import * as jose from 'jose';
 
@@ -14,26 +14,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userId, setUser] = useState<string | null>(null);
   const [userName, setName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Added loading state
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const userName = localStorage.getItem('userName');
-    const userId = localStorage.getItem('userId');
-    if (token && userName && userId) {
-      verifyToken(token, userName, userId);
-    }
-  }, []);
-
-  const verifyToken = async (token: string, userName: string, userId: string) => {
+  const verifyToken = useCallback(async (token: string, storedUserName: string, storedUserId: string) => {
     const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET as string;
     try {
-      const { payload } = await jose.jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-      setUser(userId);
-      setName(userName);
+      await jose.jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      setUser(storedUserId);
+      setName(storedUserName);
     } catch (error) {
       console.error('Token verification failed:', error);
       localStorage.removeItem('authToken');
@@ -41,8 +33,24 @@ export const AuthProvider: React.FC = ({ children }) => {
       localStorage.removeItem('userId');
       setUser(null);
       setName(null);
+      router.push('/');
+    } finally {
+      setLoading(false); // Ensure loading is set to false after token verification
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    const storedUserName = localStorage.getItem('userName');
+    const storedUserId = localStorage.getItem('userId');
+    if (token && storedUserName && storedUserId) {
+      verifyToken(token, storedUserName, storedUserId);
+    } else {
+      setLoading(false); // Set loading to false if no token is found
+      router.push('/');
+    }
+  }, [router, verifyToken]);
+
 
   const login = (token: string, userName: string, userId: string) => {
     localStorage.setItem('authToken', token);
@@ -50,7 +58,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     localStorage.setItem('userId', userId);
     setUser(userId);
     setName(userName);
-    router.push('/dashboard'); // Ensure redirection happens here
+    router.push('/dashboard');
   };
 
   const logout = () => {
@@ -63,6 +71,10 @@ export const AuthProvider: React.FC = ({ children }) => {
   };
 
   const isAuthenticated = () => !!userId;
+
+  if (loading) {
+    return <div>Loading...</div>; // Add a loading state UI if needed
+  }
 
   return (
     <AuthContext.Provider value={{ userId, userName, login, logout, isAuthenticated }}>

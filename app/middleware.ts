@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
             // Create a response to modify the request
             const response = NextResponse.next();
             // Set the userId cookie
-            response.cookies.set('userId', userId);
+            response.cookies.set('userId', String(userId));
             return response;
         }
     } else {

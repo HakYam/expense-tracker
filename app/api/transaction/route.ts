@@ -9,25 +9,41 @@ interface Body {
   startDate: Date;
 }
 
-//get trans by userId
-export async function GET(request: NextRequest) {
+// Connect to the database
+async function connectToDatabase() {
   try {
-     connectDB();
-    const userId = request.cookies.get("userId")?.value;
-    const transactions = await Transaction.find({ userId });
-    // return trans as a NextResponse
-    return NextResponse.json(transactions);
-  } catch (err) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 500 });
+    await connectDB();
+  } catch (error) {
+    console.error("Database connection error:", error);
+    throw new Error("Database connection failed");
   }
 }
 
-// create trans by userId
+// Get transactions by userId
+export async function GET(request: NextRequest) {
+  try {
+    await connectToDatabase();
+    const userId = request.cookies.get("userId")?.value;
+    if (!userId) {
+      return NextResponse.json({ error: "User ID not provided" }, { status: 400 });
+    }
+    const transactions = await Transaction.find({ userId });
+    return NextResponse.json(transactions);
+  } catch (err) {
+    console.error("GET error:", err);
+    return NextResponse.json({ error: "Failed to fetch transactions" }, { status: 500 });
+  }
+}
+
+// Create transaction by userId
 export async function POST(request: NextRequest) {
   try {
-    connectDB();
-    const { name, amount, startDate }: Body = await request.json();
-    const userId = request.cookies.get("userId")?.value;
+    await connectDB();
+    const { name, amount, startDate, userId }: Body = await request.json();
+
+    if (!userId) {
+      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
 
     const transaction = await Transaction.create({
       name,
@@ -38,18 +54,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(transaction);
 
   } catch (err) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 500 });
+    console.error("Error creating transaction:", err);
+    return NextResponse.json({ error: "Internal Server Error", details: err.message }, { status: 500 });
   }
 }
-
-// delete trans by userId
+// Delete transactions by userId
 export async function DELETE(request: NextRequest) {
   try {
-    connectDB();
+    await connectToDatabase();
     const userId = request.cookies.get("userId")?.value;
+    if (!userId) {
+      return NextResponse.json({ error: "User ID not provided" }, { status: 400 });
+    }
     await Transaction.deleteMany({ userId });
     return NextResponse.json({ message: "All transactions deleted" });
   } catch (err) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 500 });
+    console.error("DELETE error:", err);
+    return NextResponse.json({ error: "Failed to delete transactions" }, { status: 500 });
   }
 }

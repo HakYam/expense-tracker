@@ -12,13 +12,18 @@ interface Body {
     startDate: Date;
 }
 
+// get trans by id
 export async function GET(request: NextRequest, { params }: { params: Params }) {
     try {
         await connectDB();
         const transaction = await Transaction.findById(params.id);
+        if (!transaction) {
+            return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
+        }
         return NextResponse.json(transaction);
     } catch (err) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 500 });
+        console.error("Error fetching transaction by ID:", err);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
 
@@ -26,7 +31,7 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
 export async function PUT(request: NextRequest, { params }: { params: Params }) {
     try {
         await connectDB();
-        const {name, amount, startDate}: Body = await request.json();
+        const { name, amount, startDate }: Body = await request.json();
         const transaction = await Transaction.findByIdAndUpdate(
             params.id,
             {
@@ -36,8 +41,12 @@ export async function PUT(request: NextRequest, { params }: { params: Params }) 
             },
             { new: true }
         );
+        if (!transaction) {
+            return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
+        }
         return NextResponse.json(transaction);
     } catch (err) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 500 });
+        console.error("Error updating transaction by ID:", err);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
