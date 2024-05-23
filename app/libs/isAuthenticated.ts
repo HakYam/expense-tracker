@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import * as jose from "jose";
 
 export default async function isAuthenticated(req: NextRequest) {
-  const authorizationHeader = req.headers.get("authorization");
+  const authorizationHeader = req.headers.get("Authorization");
 
   if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
     console.error("Authorization header is missing or incorrect");

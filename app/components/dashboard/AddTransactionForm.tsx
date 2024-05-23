@@ -1,4 +1,3 @@
-// components/AddTransactionForm.tsx
 "use client";
 
 import React, { useState } from 'react';
@@ -14,7 +13,9 @@ const AddTransactionForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) {
+    const token = localStorage.getItem('authToken');
+
+    if (!userId || !token) {
       console.error('User not authenticated');
       return;
     }
@@ -25,6 +26,7 @@ const AddTransactionForm: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + localStorage.getItem('authToken'),
         },
         body: JSON.stringify(data),
       });
@@ -33,7 +35,7 @@ const AddTransactionForm: React.FC = () => {
         setName('');
         setAmount('');
         setStartDate('');
-        router.push('/'); // Redirect to home or a success page
+        
       } else {
         const errorData = await response.json();
         console.error('Failed to add transaction:', errorData);
