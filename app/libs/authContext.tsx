@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import * as jose from 'jose';
 
 interface AuthContextType {
-  user: string | null;
-  name: string | null;
-  login: (token: string, name: string, userId: string) => void;
+  userId: string | null;
+  userName: string | null;
+  login: (token: string, userName: string, userId: string) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
 }
@@ -15,8 +15,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const [user, setUser] = useState<string | null>(null);
-  const [name, setName] = useState<string | null>(null);
+  const [userId, setUser] = useState<string | null>(null);
+  const [userName, setName] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,12 +44,12 @@ export const AuthProvider: React.FC = ({ children }) => {
     }
   };
 
-  const login = (token: string, name: string, userId: string) => {
+  const login = (token: string, userName: string, userId: string) => {
     localStorage.setItem('authToken', token);
-    localStorage.setItem('userName', name);
+    localStorage.setItem('userName', userName);
     localStorage.setItem('userId', userId);
     setUser(userId);
-    setName(name);
+    setName(userName);
     router.push('/dashboard'); // Ensure redirection happens here
   };
 
@@ -62,10 +62,10 @@ export const AuthProvider: React.FC = ({ children }) => {
     router.push('/');
   };
 
-  const isAuthenticated = () => !!user;
+  const isAuthenticated = () => !!userId;
 
   return (
-    <AuthContext.Provider value={{ user, name, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ userId, userName, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

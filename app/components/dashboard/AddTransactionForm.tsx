@@ -6,7 +6,7 @@ import { useAuth } from '../../libs/authContext';
 
 const AddTransactionForm: React.FC = () => {
   const router = useRouter();
-  const { user } = useAuth();  // اجلب معرف المستخدم من سياق المصادقة
+  const { userId } = useAuth();  // اجلب معرف المستخدم من سياق المصادقة
   const [formData, setFormData] = useState({
     name: '',
     amount: '',
