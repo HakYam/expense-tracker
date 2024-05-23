@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (token: string, userName: string, userId: string) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
+  loading: boolean; // Add loading to AuthContextType
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,13 +72,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isAuthenticated = () => !!userId;
 
-  if (loading) {
-    return <div>Loading...</div>; // Add a loading state UI if needed
-  }
-
   return (
-    <AuthContext.Provider value={{ userId, userName, login, logout, isAuthenticated }}>
-      {children}
+    <AuthContext.Provider value={{ userId, userName, login, logout, isAuthenticated, loading }}>
+      {loading ? <div>Loading...</div> : children} {/* Add a loading state UI if needed */}
     </AuthContext.Provider>
   );
 };

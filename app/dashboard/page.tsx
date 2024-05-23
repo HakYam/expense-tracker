@@ -15,7 +15,7 @@ interface Transaction {
 
 const Dashboard: React.FC = () => {
   const router = useRouter();
-  const { userId, userName, isAuthenticated, logout, loading } = useAuth();
+  const { userId, userName, isAuthenticated, logout, loading } = useAuth(); 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
