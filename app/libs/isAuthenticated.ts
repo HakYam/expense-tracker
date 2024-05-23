@@ -1,13 +1,14 @@
-// isAuth function
-
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import * as jose from "jose";
 
 export default async function isAuthenticated(req: NextRequest) {
   const authorizationHeader = req.headers.get("authorization");
+  console.log("Authorization Header Received:", authorizationHeader);
+  console.log("JWT_SECRET in isAuthenticated:", process.env.JWT_SECRET);
 
   if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
-    return false;
+    console.error("Authorization header is missing or incorrect");
+    return null;
   }
 
   const token = authorizationHeader.replace("Bearer ", "");
@@ -22,6 +23,7 @@ export default async function isAuthenticated(req: NextRequest) {
     const userId = payload.userId as string;
     return userId;
   } catch (error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.error('Token verification failed:', error);
+    return null;
   }
 }

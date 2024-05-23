@@ -20,14 +20,14 @@ const AddTransactionForm: React.FC = () => {
     }
 
     try {
-        const data = { name, amount, startDate, userId };
-        const response = await fetch('/api/transaction', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data), // Stringify data before sending
-        });
+      const data = { name, amount, startDate, userId };
+      const response = await fetch('/api/transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
       if (response.ok) {
         setName('');

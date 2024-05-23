@@ -1,4 +1,4 @@
-//mongoose schema
+// mongoose schema
 import mongoose from "mongoose";
 
 interface Transaction {
@@ -13,7 +13,7 @@ const TransactionSchema = new mongoose.Schema<Transaction>(
   {
     amount: { type: Number, required: true },
     name: { type: String, required: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     startDate: { type: Date, default: Date.now },
   },
   {
@@ -21,5 +21,5 @@ const TransactionSchema = new mongoose.Schema<Transaction>(
   }
 );
 
-//mongos model (name, schema)
-export default mongoose.models.Transaction || mongoose.model<Transaction>("User", TransactionSchema);
+// mongoose model (name, schema)
+export default mongoose.models.Transaction || mongoose.model<Transaction>("Transaction", TransactionSchema);
