@@ -7,7 +7,7 @@ export const config = {
 
 export default async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
-    console.log("JWT_SECRET in middleware:", process.env.JWT_SECRET);
+    
 
     if (pathname.startsWith('/api/transaction')) {
         // Check if user is authenticated
