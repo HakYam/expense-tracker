@@ -25,11 +25,11 @@ const Budget: React.FC<BudgetProps> = ({ transactions }) => {
   const calculateBudget = (transactions: Transaction[]) => {
     const income = transactions
       .filter(transaction => transaction.amount > 0)
-      .reduce((sum, transaction) => sum + (typeof transaction.amount === 'number' ? transaction.amount : parseFloat(transaction.amount.toString())), 0);
+      .reduce((sum, transaction) => sum + transaction.amount, 0);
 
     const expenses = transactions
       .filter(transaction => transaction.amount < 0)
-      .reduce((sum, transaction) => sum + (typeof transaction.amount === 'number' ? transaction.amount : parseFloat(transaction.amount.toString())), 0);
+      .reduce((sum, transaction) => sum + transaction.amount, 0);
 
     setIncome(income);
     setExpenses(Math.abs(expenses)); // Ensure expenses are positive for display
@@ -37,7 +37,7 @@ const Budget: React.FC<BudgetProps> = ({ transactions }) => {
   };
 
   return (
-    <div className="container ">
+    <div className="container">
       <div className="bg-green-500 text-white text-2xl font-bold p-4 rounded mb-4">
         Income: ${isNaN(income) ? '0.00' : income.toFixed(2)}
       </div>
