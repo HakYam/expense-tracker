@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 
@@ -39,13 +39,13 @@ const Budget: React.FC<BudgetProps> = ({ transactions }) => {
   return (
     <div className="container">
       <div className="bg-green-500 text-white text-2xl font-bold p-4 rounded mb-4">
-        Income: ${isNaN(income) ? '0.00' : income.toFixed(2)}
+        Income: ${isNaN(Number(income)) ? '0.00' : Number(income).toFixed(2)}
       </div>
       <div className="bg-red-500 text-white text-2xl font-bold p-4 rounded mb-4">
-        Expenses: ${isNaN(expenses) ? '0.00' : expenses.toFixed(2)}
+        Expenses: ${isNaN(Number(expenses)) ? '0.00' : Number(expenses).toFixed(2)}
       </div>
       <div className="bg-gray-200 text-black text-2xl font-bold p-4 rounded">
-        Budget: ${isNaN(budget) ? '0.00' : budget.toFixed(2)}
+        Budget: ${isNaN(Number(budget)) ? '0.00' : Number(budget).toFixed(2)}
       </div>
     </div>
   );

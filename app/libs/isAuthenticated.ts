@@ -10,7 +10,7 @@ export default async function isAuthenticated(req: NextRequest) {
   }
 
   const token = authorizationHeader.replace("Bearer ", "");
-  const JWT_SECRET = process.env.JWT_SECRET as string;
+  const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET as string;
 
   if (!JWT_SECRET) {
     console.error("JWT_SECRET is not defined");

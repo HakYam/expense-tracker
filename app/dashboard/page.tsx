@@ -1,11 +1,10 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../libs/authContext";
-import AddTransactionForm from "../components/dashboard/AddTransactionForm";
-import TransactionTable from "../components/dashboard/TransactionTable";
-import Budget from "../components/dashboard/Budget";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../libs/authContext';
+import AddTransactionForm from '../components/dashboard/AddTransactionForm';
+import TransactionTable from '../components/dashboard/TransactionTable';
+import Budget from '../components/dashboard/Budget';
 
 interface Transaction {
   _id: string;
@@ -16,25 +15,25 @@ interface Transaction {
 
 const Dashboard: React.FC = () => {
   const router = useRouter();
-  const { userId, userName, isAuthenticated, logout } = useAuth();
+  const { userId, userName, isAuthenticated, logout, loading } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push("/");
-    } else {
+    if (!loading && !isAuthenticated()) {
+      router.push('/');
+    } else if (isAuthenticated()) {
       fetchTransactions();
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, loading]);
 
   const fetchTransactions = async () => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
     if (!token) {
-      console.error("User not authenticated");
+      console.error('User not authenticated');
       return;
     }
 
-    const response = await fetch("/api/transaction", {
+    const response = await fetch('/api/transaction', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -44,26 +43,23 @@ const Dashboard: React.FC = () => {
       const data: Transaction[] = await response.json();
       setTransactions(data);
     } else {
-      console.error("Failed to fetch transactions");
+      console.error('Failed to fetch transactions');
     }
   };
 
   const handleAddTransaction = (newTransaction: Transaction) => {
-    setTransactions((prevTransactions) => [
-      ...prevTransactions,
-      newTransaction,
-    ]);
+    setTransactions((prevTransactions) => [...prevTransactions, newTransaction]);
   };
 
   const handleDeleteTransaction = async (id: string) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
     if (!token) {
-      console.error("User not authenticated");
+      console.error('User not authenticated');
       return;
     }
 
     const response = await fetch(`/api/transaction/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -74,21 +70,21 @@ const Dashboard: React.FC = () => {
         prevTransactions.filter((transaction) => transaction._id !== id)
       );
     } else {
-      console.error("Failed to delete transaction");
+      console.error('Failed to delete transaction');
     }
   };
 
   const handleUpdateTransaction = async (updatedTransaction: Transaction) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem('authToken');
     if (!token) {
-      console.error("User not authenticated");
+      console.error('User not authenticated');
       return;
     }
 
     const response = await fetch(`/api/transaction/${updatedTransaction._id}`, {
-      method: "PUT",
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(updatedTransaction),
@@ -97,15 +93,17 @@ const Dashboard: React.FC = () => {
     if (response.ok) {
       setTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
-          transaction._id === updatedTransaction._id
-            ? updatedTransaction
-            : transaction
+          transaction._id === updatedTransaction._id ? updatedTransaction : transaction
         )
       );
     } else {
-      console.error("Failed to update transaction");
+      console.error('Failed to update transaction');
     }
   };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   if (!isAuthenticated()) {
     return <p>Redirecting...</p>;
