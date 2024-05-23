@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
 
   const verifyToken = useCallback(async (token: string, storedUserName: string, storedUserId: string) => {
-    const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET as string;
+    const JWT_SECRET = process.env.JWT_SECRET as string;
     try {
       await jose.jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
       setUser(storedUserId);

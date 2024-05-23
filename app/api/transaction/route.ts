@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import isAuthenticated from "./app/libs/isAuthenticated";
+import isAuthenticated from "../../libs/isAuthenticated";
 
 
 export const config = {
