@@ -1,4 +1,3 @@
-### Professional README for Expense Tracker Project
 
 # Expense Tracker
 
